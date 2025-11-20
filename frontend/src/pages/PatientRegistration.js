@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { motion } from "framer-motion";
 import ProviderLayout from "../layouts/ProviderLayout";
 import { useNavigate } from "react-router-dom";
 
@@ -25,7 +26,6 @@ const PatientRegistration = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // TODO: Implement actual registration logic here (API call)
     console.log("Registering patient:", formData);
     alert("Patient registered successfully! (Mock)");
     navigate("/provider/patient-search");
@@ -34,22 +34,39 @@ const PatientRegistration = () => {
   return (
     <ProviderLayout>
       <div className="mx-auto max-w-4xl">
-        <div className="mb-8">
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="mb-8"
+        >
           <h1 className="text-neutral-dark dark:text-neutral-light text-4xl font-black leading-tight tracking-[-0.033em]">
             Register New Patient
           </h1>
           <p className="text-neutral-medium text-base font-normal leading-normal mt-2">
             Enter patient details to create a new record.
           </p>
-        </div>
+        </motion.div>
 
-        <div className="bg-white dark:bg-neutral-dark rounded-xl border border-neutral-light/50 dark:border-neutral-dark/50 shadow-sm p-6 lg:p-8">
+        {/* Form Card */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+          className="bg-white dark:bg-neutral-dark rounded-xl border border-neutral-light/50 dark:border-neutral-dark/50 shadow-sm p-6 lg:p-8"
+        >
           <form
             onSubmit={handleSubmit}
             className="grid grid-cols-1 md:grid-cols-2 gap-6"
           >
             {/* Full Name */}
-            <div className="flex flex-col">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.4, delay: 0.2 }}
+              className="flex flex-col"
+            >
               <label
                 className="text-neutral-dark dark:text-neutral-light text-base font-medium leading-normal pb-2"
                 htmlFor="fullName"
@@ -66,10 +83,15 @@ const PatientRegistration = () => {
                 placeholder="e.g., Jane Doe"
                 type="text"
               />
-            </div>
+            </motion.div>
 
             {/* Patient ID */}
-            <div className="flex flex-col">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.4, delay: 0.25 }}
+              className="flex flex-col"
+            >
               <label
                 className="text-neutral-dark dark:text-neutral-light text-base font-medium leading-normal pb-2"
                 htmlFor="patientId"
@@ -86,10 +108,15 @@ const PatientRegistration = () => {
                 placeholder="e.g., MS-12345"
                 type="text"
               />
-            </div>
+            </motion.div>
 
             {/* Phone Number */}
-            <div className="flex flex-col">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.4, delay: 0.3 }}
+              className="flex flex-col"
+            >
               <label
                 className="text-neutral-dark dark:text-neutral-light text-base font-medium leading-normal pb-2"
                 htmlFor="phoneNumber"
@@ -106,10 +133,15 @@ const PatientRegistration = () => {
                 placeholder="e.g., 08012345678"
                 type="tel"
               />
-            </div>
+            </motion.div>
 
             {/* Age */}
-            <div className="flex flex-col">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.4, delay: 0.35 }}
+              className="flex flex-col"
+            >
               <label
                 className="text-neutral-dark dark:text-neutral-light text-base font-medium leading-normal pb-2"
                 htmlFor="age"
@@ -126,10 +158,15 @@ const PatientRegistration = () => {
                 placeholder="e.g., 28"
                 type="number"
               />
-            </div>
+            </motion.div>
 
             {/* Address */}
-            <div className="flex flex-col md:col-span-2">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.4, delay: 0.4 }}
+              className="flex flex-col md:col-span-2"
+            >
               <label
                 className="text-neutral-dark dark:text-neutral-light text-base font-medium leading-normal pb-2"
                 htmlFor="address"
@@ -146,10 +183,15 @@ const PatientRegistration = () => {
                 placeholder="e.g., Kuje Village, Abuja"
                 type="text"
               />
-            </div>
+            </motion.div>
 
             {/* EDD */}
-            <div className="flex flex-col">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.4, delay: 0.45 }}
+              className="flex flex-col"
+            >
               <label
                 className="text-neutral-dark dark:text-neutral-light text-base font-medium leading-normal pb-2"
                 htmlFor="edd"
@@ -165,10 +207,15 @@ const PatientRegistration = () => {
                 onChange={handleChange}
                 type="date"
               />
-            </div>
+            </motion.div>
 
             {/* Gravida & Parity */}
-            <div className="flex flex-col md:flex-row gap-6">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.4, delay: 0.5 }}
+              className="flex flex-col md:flex-row gap-6"
+            >
               <div className="flex flex-col flex-1">
                 <label
                   className="text-neutral-dark dark:text-neutral-light text-base font-medium leading-normal pb-2"
@@ -203,27 +250,36 @@ const PatientRegistration = () => {
                   type="number"
                 />
               </div>
-            </div>
+            </motion.div>
 
             {/* Actions */}
-            <div className="flex items-center justify-end gap-4 col-span-1 md:col-span-2 mt-4">
-              <button
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.6 }}
+              className="flex items-center justify-end gap-4 col-span-1 md:col-span-2 mt-4"
+            >
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 className="text-neutral-medium font-medium text-sm px-4 py-2 rounded-lg hover:bg-neutral-light dark:hover:bg-white/10"
                 type="button"
                 onClick={() => navigate("/provider/patient-search")}
               >
                 Cancel
-              </button>
-              <button
+              </motion.button>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 className="flex items-center justify-center gap-2 h-12 px-6 bg-primary text-white rounded-lg font-bold text-base hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
                 type="submit"
               >
                 <span className="material-symbols-outlined">person_add</span>
                 Register Patient
-              </button>
-            </div>
+              </motion.button>
+            </motion.div>
           </form>
-        </div>
+        </motion.div>
       </div>
     </ProviderLayout>
   );

@@ -1,13 +1,17 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 import ProviderLayout from "../layouts/ProviderLayout";
 
 const PatientProfile = () => {
   return (
     <ProviderLayout>
       <div className="max-w-7xl mx-auto">
-        {/* MetaText / Alert Banner */}
-        <div
+        {/* Alert Banner */}
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
           className="bg-yellow-100 dark:bg-yellow-900/40 border-l-4 border-yellow-500 text-yellow-800 dark:text-yellow-200 p-4 rounded-r-lg mb-6"
           role="alert"
         >
@@ -15,9 +19,15 @@ const PatientProfile = () => {
             Data from Dorra EMR, last updated: 24/07/2024 10:30 AM. This is a
             read-only view.
           </p>
-        </div>
+        </motion.div>
+
         {/* Breadcrumbs */}
-        <div className="flex flex-wrap gap-2 mb-4">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.4, delay: 0.1 }}
+          className="flex flex-wrap gap-2 mb-4"
+        >
           <button className="text-primary dark:text-blue-300 text-base font-medium leading-normal bg-transparent border-none cursor-pointer">
             Patients
           </button>
@@ -33,19 +43,26 @@ const PatientProfile = () => {
           <span className="text-gray-800 dark:text-white text-base font-medium leading-normal">
             Medical History
           </span>
-        </div>
+        </motion.div>
+
         {/* ProfileHeader */}
-        <header className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm mb-6">
+        <motion.header
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm mb-6"
+        >
           <div className="flex w-full flex-col gap-4 @container @[520px]:flex-row @[520px]:justify-between @[520px]:items-center">
             <div className="flex gap-4 items-center">
-              <div
+              <motion.div
+                whileHover={{ scale: 1.05 }}
                 className="bg-center bg-no-repeat aspect-square bg-cover rounded-full min-h-24 w-24"
                 data-alt="Profile photo of Jane Doe"
                 style={{
                   backgroundImage:
                     "url('https://lh3.googleusercontent.com/aida-public/AB6AXuBCk0NxQNlUorGf-jmCMrY9OppoPfUVaig5ppuPXtq7f2DGuUzcrdt2NJPt-KSdm-oC0baYozfpFKSHBx-2ZeFapl8kOsM5QntIbfRlz3aKsnxISiq1BYPsR_pRvYTPIGlFL9jrBTnvoLG28eFnm0jjryKFlmRg73n78iRVyfj8dMsiYwJ6GNpbtx0yvf0mVMeE8BP89o9xvwFyzk-52xBzYJvlmOqk7HQkRW6WVjGk2Dx74HRybavNHctAyoymqIkX22m4ppE8nns')",
                 }}
-              ></div>
+              ></motion.div>
               <div className="flex flex-col justify-center">
                 <p className="text-gray-900 dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em]">
                   Jane Doe, 32
@@ -59,12 +76,14 @@ const PatientProfile = () => {
               </div>
             </div>
             <div className="flex w-full max-w-[480px] gap-3 @[480px]:w-auto">
-              <button
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={() => window.print()}
                 className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 text-sm font-bold leading-normal tracking-[0.015em] flex-1 @[480px]:flex-auto hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
               >
                 <span className="truncate">Print Summary</span>
-              </button>
+              </motion.button>
               <Link
                 to="/provider/patient-search"
                 className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold leading-normal tracking-[0.015em] flex-1 @[480px]:flex-auto hover:bg-primary/90 transition-colors"
@@ -73,175 +92,251 @@ const PatientProfile = () => {
               </Link>
             </div>
           </div>
-        </header>
-        {/* Chips / Status Tags */}
-        <div className="flex gap-3 mb-6 flex-wrap">
-          <div className="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-full bg-green-100 dark:bg-green-900/40 text-green-800 dark:text-green-200 px-4">
-            <p className="text-sm font-medium leading-normal">Pregnant</p>
-          </div>
-          <div className="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-full bg-red-100 dark:bg-red-900/40 text-red-800 dark:text-red-200 px-4">
-            <p className="text-sm font-medium leading-normal">High-Risk</p>
-          </div>
-          <div className="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-full bg-red-100 dark:bg-red-900/40 text-red-800 dark:text-red-200 px-4">
-            <p className="text-sm font-medium leading-normal">
-              Allergy: Penicillin
-            </p>
-          </div>
-        </div>
+        </motion.header>
+
+        {/* Status Tags */}
+        <motion.div
+          initial="hidden"
+          animate="visible"
+          variants={{
+            hidden: { opacity: 0 },
+            visible: {
+              opacity: 1,
+              transition: {
+                staggerChildren: 0.1,
+                delayChildren: 0.3,
+              },
+            },
+          }}
+          className="flex gap-3 mb-6 flex-wrap"
+        >
+          {[
+            { text: "Pregnant", color: "green" },
+            { text: "High-Risk", color: "red" },
+            { text: "Allergy: Penicillin", color: "red" },
+          ].map((tag, index) => (
+            <motion.div
+              key={index}
+              variants={{
+                hidden: { opacity: 0, scale: 0.8 },
+                visible: { opacity: 1, scale: 1 },
+              }}
+              whileHover={{ scale: 1.05 }}
+              className={`flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-full bg-${tag.color}-100 dark:bg-${tag.color}-900/40 text-${tag.color}-800 dark:text-${tag.color}-200 px-4`}
+            >
+              <p className="text-sm font-medium leading-normal">{tag.text}</p>
+            </motion.div>
+          ))}
+        </motion.div>
+
         {/* Tabbed Navigation and Content */}
         <div className="flex flex-col lg:flex-row gap-8">
-          {/* Navigation on the left */}
-          <div className="w-full lg:w-1/4">
+          {/* Navigation Sidebar */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+            className="w-full lg:w-1/4"
+          >
             <ul className="flex lg:flex-col bg-white dark:bg-gray-800 p-2 rounded-xl shadow-sm space-y-1">
-              <li className="w-full">
-                <a
-                  className="block py-2 px-4 rounded-lg bg-primary/20 text-primary dark:text-white dark:bg-primary/30 text-sm font-bold"
-                  href="#overview"
-                >
-                  Overview
-                </a>
-              </li>
-              <li className="w-full">
-                <a
-                  className="block py-2 px-4 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 text-sm font-medium"
-                  href="#visit-history"
-                >
-                  Visit History
-                </a>
-              </li>
-              <li className="w-full">
-                <a
-                  className="block py-2 px-4 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 text-sm font-medium"
-                  href="#allergies"
-                >
-                  Allergies
-                </a>
-              </li>
-              <li className="w-full">
-                <a
-                  className="block py-2 px-4 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 text-sm font-medium"
-                  href="#medical-history"
-                >
-                  Medical History
-                </a>
-              </li>
+              {[
+                "Overview",
+                "Medical History",
+                "Medications",
+                "Appointments",
+              ].map((item, index) => (
+                <motion.li key={index} whileHover={{ x: 5 }} className="w-full">
+                  <a
+                    className={`block py-2 px-4 rounded-lg ${
+                      index === 0
+                        ? "bg-primary/20 text-primary dark:text-white dark:bg-primary/30"
+                        : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    } text-sm font-bold transition-colors`}
+                    href={`#${item.toLowerCase().replace(" ", "-")}`}
+                  >
+                    {item}
+                  </a>
+                </motion.li>
+              ))}
             </ul>
-          </div>
-          {/* Content on the right */}
-          <div className="w-full lg:w-3/4">
-            {/* Overview Section */}
-            <div className="space-y-6" id="overview">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-                Pregnancy Status
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm">
-                <div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Status
-                  </p>
-                  <p className="text-base font-medium text-gray-800 dark:text-gray-200">
-                    Pregnant
-                  </p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Gestational Age
-                  </p>
-                  <p className="text-base font-medium text-gray-800 dark:text-gray-200">
-                    28 weeks, 3 days
-                  </p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Estimated Due Date (EDD)
-                  </p>
-                  <p className="text-base font-medium text-gray-800 dark:text-gray-200">
-                    15/10/2024
-                  </p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Past Obstetric History
-                  </p>
-                  <p className="text-base font-medium text-gray-800 dark:text-gray-200">
-                    G2 P1 A0
-                  </p>
-                </div>
-              </div>
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white pt-4">
-                Visit History (Recent)
-              </h2>
-              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm">
-                <ul className="divide-y divide-gray-200 dark:divide-gray-700">
-                  <li className="p-4 flex justify-between items-center hover:bg-gray-50 dark:hover:bg-gray-700/50">
-                    <div>
-                      <p className="font-semibold text-gray-800 dark:text-gray-200">
-                        Routine Antenatal Check-up
-                      </p>
+          </motion.div>
+
+          {/* Main Content */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.5 }}
+            className="w-full lg:w-3/4"
+          >
+            <div className="space-y-6">
+              {/* Overview Section */}
+              <motion.section
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.6 }}
+                className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6"
+              >
+                <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+                  Overview
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {[
+                    { label: "Blood Type", value: "O+" },
+                    { label: "Gestational Age", value: "24 weeks" },
+                    { label: "EDD", value: "15/12/2024" },
+                    { label: "Last Visit", value: "20/07/2024" },
+                  ].map((item, index) => (
+                    <motion.div
+                      key={index}
+                      whileHover={{ x: 5 }}
+                      className="border-l-4 border-primary pl-4"
+                    >
                       <p className="text-sm text-gray-500 dark:text-gray-400">
-                        Dr. Emily Carter - St. Luke's Clinic
+                        {item.label}
                       </p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-sm font-medium text-gray-600 dark:text-gray-300">
-                        15/07/2024
+                      <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                        {item.value}
                       </p>
-                    </div>
-                  </li>
-                  <li className="p-4 flex justify-between items-center hover:bg-gray-50 dark:hover:bg-gray-700/50">
-                    <div>
-                      <p className="font-semibold text-gray-800 dark:text-gray-200">
-                        Ultrasound Scan
-                      </p>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
-                        Radiology Dept - St. Luke's Clinic
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-sm font-medium text-gray-600 dark:text-gray-300">
-                        01/06/2024
-                      </p>
-                    </div>
-                  </li>
-                </ul>
-              </div>
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white pt-4">
-                Medical History
-              </h2>
-              <div className="space-y-4">
-                {/* Accordion Panel 1 */}
-                <details className="group bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden">
-                  <summary className="flex cursor-pointer list-none items-center justify-between p-4 font-medium text-gray-900 dark:text-white">
-                    <span>Chronic Conditions</span>
-                    <span className="transition group-open:rotate-180">
-                      <span className="material-symbols-outlined">
-                        expand_more
+                    </motion.div>
+                  ))}
+                </div>
+              </motion.section>
+
+              {/* Medical History Section */}
+              <motion.section
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.7 }}
+                className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6"
+              >
+                <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+                  Medical History
+                </h2>
+                <motion.div
+                  initial="hidden"
+                  animate="visible"
+                  variants={{
+                    hidden: { opacity: 0 },
+                    visible: {
+                      opacity: 1,
+                      transition: {
+                        staggerChildren: 0.1,
+                        delayChildren: 0.8,
+                      },
+                    },
+                  }}
+                  className="space-y-4"
+                >
+                  {[
+                    {
+                      date: "20/07/2024",
+                      event: "Routine Antenatal Check",
+                      status: "Completed",
+                    },
+                    {
+                      date: "15/06/2024",
+                      event: "Ultrasound Scan",
+                      status: "Completed",
+                    },
+                    {
+                      date: "01/05/2024",
+                      event: "First Antenatal Visit",
+                      status: "Completed",
+                    },
+                  ].map((record, index) => (
+                    <motion.div
+                      key={index}
+                      variants={{
+                        hidden: { opacity: 0, x: -20 },
+                        visible: { opacity: 1, x: 0 },
+                      }}
+                      whileHover={{ scale: 1.02, x: 5 }}
+                      className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                    >
+                      <div>
+                        <p className="font-semibold text-gray-900 dark:text-white">
+                          {record.event}
+                        </p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                          {record.date}
+                        </p>
+                      </div>
+                      <span className="px-3 py-1 bg-green-100 dark:bg-green-900/40 text-green-800 dark:text-green-200 text-sm font-medium rounded-full">
+                        {record.status}
                       </span>
-                    </span>
-                  </summary>
-                  <div className="border-t border-gray-200 dark:border-gray-700 p-4 text-gray-600 dark:text-gray-300">
-                    <p>
-                      Hypertension, diagnosed 2021. Managed with medication.
-                    </p>
-                  </div>
-                </details>
-                {/* Accordion Panel 2 */}
-                <details className="group bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden">
-                  <summary className="flex cursor-pointer list-none items-center justify-between p-4 font-medium text-gray-900 dark:text-white">
-                    <span>Surgical History</span>
-                    <span className="transition group-open:rotate-180">
-                      <span className="material-symbols-outlined">
-                        expand_more
+                    </motion.div>
+                  ))}
+                </motion.div>
+              </motion.section>
+
+              {/* Current Medications Section */}
+              <motion.section
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.9 }}
+                className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6"
+              >
+                <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+                  Current Medications
+                </h2>
+                <motion.div
+                  initial="hidden"
+                  animate="visible"
+                  variants={{
+                    hidden: { opacity: 0 },
+                    visible: {
+                      opacity: 1,
+                      transition: {
+                        staggerChildren: 0.1,
+                        delayChildren: 1.0,
+                      },
+                    },
+                  }}
+                  className="space-y-3"
+                >
+                  {[
+                    {
+                      name: "Folic Acid",
+                      dosage: "400mcg daily",
+                      safety: "Safe",
+                    },
+                    {
+                      name: "Iron Supplement",
+                      dosage: "65mg daily",
+                      safety: "Safe",
+                    },
+                    {
+                      name: "Prenatal Vitamins",
+                      dosage: "1 tablet daily",
+                      safety: "Safe",
+                    },
+                  ].map((med, index) => (
+                    <motion.div
+                      key={index}
+                      variants={{
+                        hidden: { opacity: 0, y: 20 },
+                        visible: { opacity: 1, y: 0 },
+                      }}
+                      whileHover={{ scale: 1.02 }}
+                      className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg"
+                    >
+                      <div>
+                        <p className="font-semibold text-gray-900 dark:text-white">
+                          {med.name}
+                        </p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                          {med.dosage}
+                        </p>
+                      </div>
+                      <span className="px-3 py-1 bg-green-100 dark:bg-green-900/40 text-green-800 dark:text-green-200 text-sm font-medium rounded-full">
+                        {med.safety}
                       </span>
-                    </span>
-                  </summary>
-                  <div className="border-t border-gray-200 dark:border-gray-700 p-4 text-gray-600 dark:text-gray-300">
-                    <p>Appendectomy, 2015. No complications.</p>
-                  </div>
-                </details>
-              </div>
+                    </motion.div>
+                  ))}
+                </motion.div>
+              </motion.section>
             </div>
-          </div>
+          </motion.div>
         </div>
       </div>
     </ProviderLayout>
