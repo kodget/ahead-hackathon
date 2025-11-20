@@ -1,4 +1,5 @@
 import React from "react";
+import { motion } from "framer-motion";
 import ProviderLayout from "../layouts/ProviderLayout";
 
 const DrugFlagAnalytics = () => {
@@ -6,214 +7,357 @@ const DrugFlagAnalytics = () => {
     <ProviderLayout>
       <div className="flex flex-col gap-6">
         {/* Header */}
-        <div className="flex flex-col gap-1">
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="flex flex-col gap-1"
+        >
           <h1 className="text-[#111812] dark:text-white text-3xl font-black leading-tight tracking-tight">
             Drug Flag Analytics
           </h1>
           <p className="text-[#618968] dark:text-gray-400 text-base font-normal leading-normal">
             Monitoring medication safety checks and interaction alerts.
           </p>
-        </div>
+        </motion.div>
 
         {/* KPI Cards */}
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-4">
-          <div className="flex flex-col gap-2 rounded-xl p-6 bg-white dark:bg-[#182c1b] border border-[#dbe6dd] dark:border-[#2a4d31]">
-            <p className="text-[#111812] dark:text-gray-300 text-base font-medium leading-normal">
-              Total Checks (Today)
-            </p>
-            <p className="text-[#111812] dark:text-white tracking-light text-4xl font-bold leading-tight">
-              156
-            </p>
-          </div>
-          <div className="flex flex-col gap-2 rounded-xl p-6 bg-white dark:bg-[#182c1b] border border-[#dbe6dd] dark:border-[#2a4d31]">
-            <p className="text-[#111812] dark:text-gray-300 text-base font-medium leading-normal">
-              Red Flags (Unsafe)
-            </p>
-            <p className="text-red-600 dark:text-red-400 tracking-light text-4xl font-bold leading-tight">
-              12
-            </p>
-            <p className="text-sm text-gray-500">7.6% of checks</p>
-          </div>
-          <div className="flex flex-col gap-2 rounded-xl p-6 bg-white dark:bg-[#182c1b] border border-[#dbe6dd] dark:border-[#2a4d31]">
-            <p className="text-[#111812] dark:text-gray-300 text-base font-medium leading-normal">
-              Yellow Flags (Caution)
-            </p>
-            <p className="text-yellow-600 dark:text-yellow-400 tracking-light text-4xl font-bold leading-tight">
-              28
-            </p>
-            <p className="text-sm text-gray-500">17.9% of checks</p>
-          </div>
-          <div className="flex flex-col gap-2 rounded-xl p-6 bg-white dark:bg-[#182c1b] border border-[#dbe6dd] dark:border-[#2a4d31]">
-            <p className="text-[#111812] dark:text-gray-300 text-base font-medium leading-normal">
-              Most Flagged Drug
-            </p>
-            <p
-              className="text-[#111812] dark:text-white tracking-light text-2xl font-bold leading-tight truncate"
-              title="Ibuprofen (Third Trimester)"
+        <motion.div
+          initial="hidden"
+          animate="visible"
+          variants={{
+            hidden: { opacity: 0 },
+            visible: {
+              opacity: 1,
+              transition: {
+                staggerChildren: 0.1,
+                delayChildren: 0.2,
+              },
+            },
+          }}
+          className="grid grid-cols-1 gap-6 sm:grid-cols-4"
+        >
+          {[
+            {
+              label: "Total Checks (Today)",
+              value: "156",
+              color: "text-[#111812] dark:text-white",
+            },
+            {
+              label: "Red Flags (Unsafe)",
+              value: "12",
+              color: "text-red-600 dark:text-red-400",
+              subtitle: "7.6% of checks",
+            },
+            {
+              label: "Yellow Flags (Caution)",
+              value: "28",
+              color: "text-yellow-600 dark:text-yellow-400",
+              subtitle: "17.9% of checks",
+            },
+            {
+              label: "Most Flagged Drug",
+              value: "Ibuprofen",
+              color: "text-[#111812] dark:text-white",
+              subtitle: "Third Trimester Risk",
+              size: "text-2xl",
+            },
+          ].map((kpi, index) => (
+            <motion.div
+              key={index}
+              variants={{
+                hidden: { opacity: 0, y: 20 },
+                visible: { opacity: 1, y: 0 },
+              }}
+              whileHover={{ scale: 1.03, y: -5 }}
+              className="flex flex-col gap-2 rounded-xl p-6 bg-white dark:bg-[#182c1b] border border-[#dbe6dd] dark:border-[#2a4d31]"
             >
-              Ibuprofen
-            </p>
-            <p className="text-sm text-gray-500">Third Trimester Risk</p>
-          </div>
-        </div>
+              <p className="text-[#111812] dark:text-gray-300 text-base font-medium leading-normal">
+                {kpi.label}
+              </p>
+              <p
+                className={`${kpi.color} tracking-light ${
+                  kpi.size || "text-4xl"
+                } font-bold leading-tight ${
+                  kpi.size === "text-2xl" ? "truncate" : ""
+                }`}
+              >
+                {kpi.value}
+              </p>
+              {kpi.subtitle && (
+                <p className="text-sm text-gray-500">{kpi.subtitle}</p>
+              )}
+            </motion.div>
+          ))}
+        </motion.div>
 
         {/* Charts Section */}
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           {/* Flag Categories */}
-          <div className="flex flex-col gap-4 rounded-xl border border-[#dbe6dd] dark:border-[#2a4d31] bg-white dark:bg-[#182c1b] p-6">
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.6 }}
+            className="flex flex-col gap-4 rounded-xl border border-[#dbe6dd] dark:border-[#2a4d31] bg-white dark:bg-[#182c1b] p-6"
+          >
             <h3 className="text-lg font-bold text-[#111812] dark:text-white">
               Flag Categories
             </h3>
-            <div className="flex flex-col gap-3 pt-2">
-              <div className="space-y-1">
-                <div className="flex justify-between text-sm font-medium dark:text-gray-300">
-                  <span>Teratogenic Risk</span>
-                  <span>45%</span>
-                </div>
-                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
-                  <div
-                    className="bg-red-600 h-2.5 rounded-full"
-                    style={{ width: "45%" }}
-                  ></div>
-                </div>
-              </div>
-              <div className="space-y-1">
-                <div className="flex justify-between text-sm font-medium dark:text-gray-300">
-                  <span>Drug-Drug Interaction</span>
-                  <span>30%</span>
-                </div>
-                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
-                  <div
-                    className="bg-orange-500 h-2.5 rounded-full"
-                    style={{ width: "30%" }}
-                  ></div>
-                </div>
-              </div>
-              <div className="space-y-1">
-                <div className="flex justify-between text-sm font-medium dark:text-gray-300">
-                  <span>Dosage Warning</span>
-                  <span>15%</span>
-                </div>
-                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
-                  <div
-                    className="bg-yellow-500 h-2.5 rounded-full"
-                    style={{ width: "15%" }}
-                  ></div>
-                </div>
-              </div>
-              <div className="space-y-1">
-                <div className="flex justify-between text-sm font-medium dark:text-gray-300">
-                  <span>Allergy Conflict</span>
-                  <span>10%</span>
-                </div>
-                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
-                  <div
-                    className="bg-blue-500 h-2.5 rounded-full"
-                    style={{ width: "10%" }}
-                  ></div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Weekly Trend */}
-          <div className="flex flex-col gap-4 rounded-xl border border-[#dbe6dd] dark:border-[#2a4d31] bg-white dark:bg-[#182c1b] p-6">
-            <h3 className="text-lg font-bold text-[#111812] dark:text-white">
-              Weekly Safety Checks
-            </h3>
-            <div className="flex items-end justify-between h-[200px] gap-2 pt-4">
-              {[120, 145, 135, 160, 150, 180, 156].map((h, i) => (
-                <div
-                  key={i}
-                  className="flex flex-col items-center gap-2 w-full"
+            <motion.div
+              initial="hidden"
+              animate="visible"
+              variants={{
+                hidden: { opacity: 0 },
+                visible: {
+                  opacity: 1,
+                  transition: {
+                    staggerChildren: 0.15,
+                    delayChildren: 0.7,
+                  },
+                },
+              }}
+              className="flex flex-col gap-3 pt-2"
+            >
+              {[
+                { label: "Teratogenic Risk", percent: 45, color: "bg-red-600" },
+                {
+                  label: "Drug-Drug Interaction",
+                  percent: 30,
+                  color: "bg-orange-500",
+                },
+                {
+                  label: "Dosage Warning",
+                  percent: 15,
+                  color: "bg-yellow-500",
+                },
+                {
+                  label: "Breastfeeding Risk",
+                  percent: 10,
+                  color: "bg-blue-500",
+                },
+              ].map((category, index) => (
+                <motion.div
+                  key={index}
+                  variants={{
+                    hidden: { opacity: 0, x: -20 },
+                    visible: { opacity: 1, x: 0 },
+                  }}
+                  className="space-y-1"
                 >
-                  <div className="w-full bg-primary/20 dark:bg-primary/10 rounded-t-md relative group">
-                    <div
-                      style={{ height: `${(h / 200) * 100}%` }}
-                      className="absolute bottom-0 w-full bg-primary rounded-t-md transition-all duration-500"
-                    ></div>
+                  <div className="flex justify-between text-sm font-medium dark:text-gray-300">
+                    <span>{category.label}</span>
+                    <span>{category.percent}%</span>
                   </div>
-                  <span className="text-xs text-gray-500 dark:text-gray-400">
-                    {["M", "T", "W", "T", "F", "S", "S"][i]}
-                  </span>
-                </div>
+                  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+                    <motion.div
+                      initial={{ width: 0 }}
+                      animate={{ width: `${category.percent}%` }}
+                      transition={{
+                        duration: 1,
+                        delay: 0.8 + index * 0.15,
+                        ease: "easeOut",
+                      }}
+                      className={`${category.color} h-2.5 rounded-full`}
+                    ></motion.div>
+                  </div>
+                </motion.div>
               ))}
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
+
+          {/* Recent Flags */}
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.6 }}
+            className="flex flex-col gap-4 rounded-xl border border-[#dbe6dd] dark:border-[#2a4d31] bg-white dark:bg-[#182c1b] p-6"
+          >
+            <h3 className="text-lg font-bold text-[#111812] dark:text-white">
+              Recent Flags
+            </h3>
+            <motion.div
+              initial="hidden"
+              animate="visible"
+              variants={{
+                hidden: { opacity: 0 },
+                visible: {
+                  opacity: 1,
+                  transition: {
+                    staggerChildren: 0.1,
+                    delayChildren: 0.7,
+                  },
+                },
+              }}
+              className="flex flex-col gap-3"
+            >
+              {[
+                {
+                  drug: "Ibuprofen",
+                  risk: "High",
+                  color: "text-red-600 dark:text-red-400",
+                  bg: "bg-red-100 dark:bg-red-900/20",
+                },
+                {
+                  drug: "Aspirin",
+                  risk: "Medium",
+                  color: "text-yellow-600 dark:text-yellow-400",
+                  bg: "bg-yellow-100 dark:bg-yellow-900/20",
+                },
+                {
+                  drug: "Codeine",
+                  risk: "High",
+                  color: "text-red-600 dark:text-red-400",
+                  bg: "bg-red-100 dark:bg-red-900/20",
+                },
+                {
+                  drug: "Warfarin",
+                  risk: "High",
+                  color: "text-red-600 dark:text-red-400",
+                  bg: "bg-red-100 dark:bg-red-900/20",
+                },
+              ].map((flag, index) => (
+                <motion.div
+                  key={index}
+                  variants={{
+                    hidden: { opacity: 0, y: 20 },
+                    visible: { opacity: 1, y: 0 },
+                  }}
+                  whileHover={{ scale: 1.02, x: 5 }}
+                  className="flex items-center justify-between p-3 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+                >
+                  <div>
+                    <p className="font-semibold text-[#111812] dark:text-white">
+                      {flag.drug}
+                    </p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      Flagged 2 hours ago
+                    </p>
+                  </div>
+                  <span
+                    className={`px-3 py-1 rounded-full text-sm font-medium ${flag.color} ${flag.bg}`}
+                  >
+                    {flag.risk}
+                  </span>
+                </motion.div>
+              ))}
+            </motion.div>
+          </motion.div>
         </div>
 
-        {/* Recent Flags Table */}
-        <div className="flex flex-col gap-4 rounded-xl border border-[#dbe6dd] dark:border-[#2a4d31] bg-white dark:bg-[#182c1b] p-6">
-          <h3 className="text-lg font-bold text-[#111812] dark:text-white">
-            Recent Safety Flags
-          </h3>
+        {/* Top Flagged Drugs Table */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.8 }}
+          className="rounded-xl border border-[#dbe6dd] dark:border-[#2a4d31] bg-white dark:bg-[#182c1b] overflow-hidden"
+        >
+          <div className="p-6 border-b border-[#dbe6dd] dark:border-[#2a4d31]">
+            <h3 className="text-lg font-bold text-[#111812] dark:text-white">
+              Top Flagged Drugs (This Week)
+            </h3>
+          </div>
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
-              <thead className="border-b border-[#dbe6dd] dark:border-[#2a4d31] text-[#618968] dark:text-gray-400">
+            <table className="w-full">
+              <thead className="bg-gray-50 dark:bg-gray-800/50">
                 <tr>
-                  <th className="py-3 px-4 font-medium">Drug Name</th>
-                  <th className="py-3 px-4 font-medium">Patient ID</th>
-                  <th className="py-3 px-4 font-medium">Issue</th>
-                  <th className="py-3 px-4 font-medium">Severity</th>
-                  <th className="py-3 px-4 font-medium">Action Taken</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Drug Name
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Flags
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Risk Level
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Category
+                  </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#dbe6dd] dark:divide-[#2a4d31]">
-                <tr className="hover:bg-gray-50 dark:hover:bg-white/5">
-                  <td className="py-3 px-4 font-medium text-[#111812] dark:text-white">
-                    Warfarin
-                  </td>
-                  <td className="py-3 px-4 text-gray-600 dark:text-gray-300">
-                    P-10293
-                  </td>
-                  <td className="py-3 px-4">Teratogenic Risk</td>
-                  <td className="py-3 px-4">
-                    <span className="bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-300 px-2 py-1 rounded-full text-xs font-bold">
-                      High
-                    </span>
-                  </td>
-                  <td className="py-3 px-4 text-gray-600 dark:text-gray-300">
-                    Prescription Blocked
-                  </td>
-                </tr>
-                <tr className="hover:bg-gray-50 dark:hover:bg-white/5">
-                  <td className="py-3 px-4 font-medium text-[#111812] dark:text-white">
-                    Aspirin
-                  </td>
-                  <td className="py-3 px-4 text-gray-600 dark:text-gray-300">
-                    P-44512
-                  </td>
-                  <td className="py-3 px-4">Bleeding Risk (3rd Tri)</td>
-                  <td className="py-3 px-4">
-                    <span className="bg-orange-100 dark:bg-orange-900/50 text-orange-700 dark:text-orange-300 px-2 py-1 rounded-full text-xs font-bold">
-                      Medium
-                    </span>
-                  </td>
-                  <td className="py-3 px-4 text-gray-600 dark:text-gray-300">
-                    Alternative Suggested
-                  </td>
-                </tr>
-                <tr className="hover:bg-gray-50 dark:hover:bg-white/5">
-                  <td className="py-3 px-4 font-medium text-[#111812] dark:text-white">
-                    Amoxicillin
-                  </td>
-                  <td className="py-3 px-4 text-gray-600 dark:text-gray-300">
-                    P-99210
-                  </td>
-                  <td className="py-3 px-4">Patient Allergy</td>
-                  <td className="py-3 px-4">
-                    <span className="bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-300 px-2 py-1 rounded-full text-xs font-bold">
-                      High
-                    </span>
-                  </td>
-                  <td className="py-3 px-4 text-gray-600 dark:text-gray-300">
-                    Prescription Blocked
-                  </td>
-                </tr>
-              </tbody>
+              <motion.tbody
+                initial="hidden"
+                animate="visible"
+                variants={{
+                  hidden: { opacity: 0 },
+                  visible: {
+                    opacity: 1,
+                    transition: {
+                      staggerChildren: 0.05,
+                      delayChildren: 0.9,
+                    },
+                  },
+                }}
+                className="divide-y divide-gray-200 dark:divide-gray-700"
+              >
+                {[
+                  {
+                    name: "Ibuprofen",
+                    flags: 45,
+                    risk: "High",
+                    category: "NSAID",
+                  },
+                  {
+                    name: "Aspirin",
+                    flags: 32,
+                    risk: "Medium",
+                    category: "Antiplatelet",
+                  },
+                  {
+                    name: "Codeine",
+                    flags: 28,
+                    risk: "High",
+                    category: "Opioid",
+                  },
+                  {
+                    name: "Warfarin",
+                    flags: 24,
+                    risk: "High",
+                    category: "Anticoagulant",
+                  },
+                  {
+                    name: "Metformin",
+                    flags: 18,
+                    risk: "Low",
+                    category: "Antidiabetic",
+                  },
+                ].map((drug, index) => (
+                  <motion.tr
+                    key={index}
+                    variants={{
+                      hidden: { opacity: 0, x: -20 },
+                      visible: { opacity: 1, x: 0 },
+                    }}
+                    whileHover={{ backgroundColor: "rgba(0,0,0,0.02)" }}
+                    className="hover:bg-gray-50 dark:hover:bg-gray-800/50"
+                  >
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-[#111812] dark:text-white">
+                      {drug.name}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                      {drug.flags}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span
+                        className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                          drug.risk === "High"
+                            ? "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400"
+                            : drug.risk === "Medium"
+                            ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400"
+                            : "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400"
+                        }`}
+                      >
+                        {drug.risk}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                      {drug.category}
+                    </td>
+                  </motion.tr>
+                ))}
+              </motion.tbody>
             </table>
           </div>
-        </div>
+        </motion.div>
       </div>
     </ProviderLayout>
   );
