@@ -1,9 +1,9 @@
 import React from "react";
+import { motion } from "framer-motion";
 import ProviderLayout from "../layouts/ProviderLayout";
 
 const RiskResult = () => {
   const generateCSV = () => {
-    // Medication Safety Check Results Data
     const data = [
       ["MEDICATION SAFETY CHECK RESULTS"],
       [],
@@ -35,7 +35,6 @@ const RiskResult = () => {
       ["Alternative C", "Suitable with monitoring"],
     ];
 
-    // Generate Metadata
     const timestamp = new Date().toISOString();
     const reportId =
       Math.random().toString(36).substring(2, 15) +
@@ -53,7 +52,6 @@ const RiskResult = () => {
     ];
 
     const fullData = [...data, ...metadata];
-
     const csvContent =
       "data:text/csv;charset=utf-8," +
       fullData.map((e) => e.join(",")).join("\n");
@@ -71,19 +69,56 @@ const RiskResult = () => {
     <ProviderLayout>
       <div className="max-w-7xl mx-auto">
         {/* PageHeading */}
-        <div className="mb-8">
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="mb-8"
+        >
           <p className="text-charcoal dark:text-gray-200 text-4xl font-black leading-tight tracking-[-0.033em]">
             Medication Safety Check Results
           </p>
           <p className="text-gray-500 dark:text-gray-400 mt-1">
             Checked Medication: Drug X, 50mg, twice daily
           </p>
-        </div>
+        </motion.div>
+
+        {/* Alert Banner */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ duration: 0.5, type: "spring", stiffness: 300 }}
+          className="mb-8 p-6 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 rounded-lg shadow-sm"
+        >
+          <div className="flex items-center gap-4">
+            <span className="material-symbols-outlined text-red-600 dark:text-red-400 text-4xl">
+              warning
+            </span>
+            <div>
+              <h3 className="text-red-800 dark:text-red-300 text-lg font-bold">
+                High Risk Medication Detected
+              </h3>
+              <p className="text-red-700 dark:text-red-400 text-sm mt-1">
+                This medication poses significant risks during pregnancy. Review
+                alternatives below.
+              </p>
+            </div>
+          </div>
+        </motion.div>
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left Column: Analysis */}
-          <div className="lg:col-span-2 flex flex-col gap-6">
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="lg:col-span-2 flex flex-col gap-6"
+          >
             {/* Teratogenic Shield Alert */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md border-2 border-danger p-6 flex flex-col sm:flex-row items-center gap-6">
+            <motion.div
+              whileHover={{ scale: 1.02 }}
+              className="bg-white dark:bg-gray-800 rounded-xl shadow-md border-2 border-danger p-6 flex flex-col sm:flex-row items-center gap-6"
+            >
               <div className="text-danger">
                 <span
                   className="material-symbols-outlined"
@@ -103,113 +138,171 @@ const RiskResult = () => {
                   </strong>
                 </p>
               </div>
-            </div>
-            {/* SectionHeader */}
-            <h2 className="text-charcoal dark:text-gray-200 text-[22px] font-bold leading-tight tracking-[-0.015em] pt-2">
-              Safety Analysis
-            </h2>
-            {/* Analysis List */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md divide-y divide-gray-200 dark:divide-gray-700">
-              {/* ListItem: Pregnancy Risk */}
-              <div className="flex items-center gap-4 px-6 min-h-[72px] py-4 justify-between">
-                <div className="flex items-center gap-4">
-                  <div className="text-danger flex items-center justify-center rounded-lg bg-danger/10 shrink-0 size-12">
-                    <span className="material-symbols-outlined text-3xl">
-                      pregnant_woman
-                    </span>
-                  </div>
-                  <div className="flex flex-col justify-center">
-                    <p className="text-charcoal dark:text-white text-base font-medium leading-normal">
-                      Pregnancy Risk Category
-                    </p>
-                    <p className="text-gray-600 dark:text-gray-400 text-sm font-normal leading-normal">
-                      Category X - Studies in animals or humans have
-                      demonstrated fetal abnormalities.
-                    </p>
-                  </div>
-                </div>
-                <div className="shrink-0">
-                  <div className="flex items-center justify-center">
-                    <div className="size-4 rounded-full bg-danger"></div>
-                  </div>
-                </div>
+            </motion.div>
+
+            {/* Safety Analysis Card */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+              className="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden"
+            >
+              <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+                <h3 className="text-xl font-bold text-charcoal dark:text-white">
+                  Safety Analysis
+                </h3>
               </div>
-              {/* ListItem: Teratogenic Red Flag */}
-              <div className="flex items-center gap-4 px-6 min-h-[72px] py-4 justify-between">
-                <div className="flex items-center gap-4">
-                  <div className="text-danger flex items-center justify-center rounded-lg bg-danger/10 shrink-0 size-12">
-                    <span className="material-symbols-outlined text-3xl">
-                      error
-                    </span>
+              <motion.div
+                initial="hidden"
+                animate="visible"
+                variants={{
+                  hidden: { opacity: 0 },
+                  visible: {
+                    opacity: 1,
+                    transition: {
+                      staggerChildren: 0.1,
+                      delayChildren: 0.4,
+                    },
+                  },
+                }}
+              >
+                {/* Pregnancy Risk */}
+                <motion.div
+                  variants={{
+                    hidden: { opacity: 0, x: -20 },
+                    visible: { opacity: 1, x: 0 },
+                  }}
+                  whileHover={{ x: 5, backgroundColor: "rgba(0,0,0,0.02)" }}
+                  className="flex items-center gap-4 px-6 min-h-[72px] py-4 justify-between border-b border-gray-200 dark:border-gray-700"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="text-danger flex items-center justify-center rounded-lg bg-danger/10 shrink-0 size-12">
+                      <span className="material-symbols-outlined text-3xl">
+                        pregnant_woman
+                      </span>
+                    </div>
+                    <div className="flex flex-col justify-center">
+                      <p className="text-charcoal dark:text-white text-base font-medium leading-normal">
+                        Pregnancy Risk Category
+                      </p>
+                      <p className="text-gray-600 dark:text-gray-400 text-sm font-normal leading-normal">
+                        Category X - Fetal abnormalities demonstrated in
+                        studies.
+                      </p>
+                    </div>
                   </div>
-                  <div className="flex flex-col justify-center">
-                    <p className="text-charcoal dark:text-white text-base font-medium leading-normal">
-                      Teratogenic Red Flag
-                    </p>
-                    <p className="text-gray-600 dark:text-gray-400 text-sm font-normal leading-normal">
-                      Positive - High risk of causing structural or functional
-                      defects in the embryo or fetus.
-                    </p>
+                  <div className="shrink-0">
+                    <div className="flex items-center justify-center">
+                      <div className="size-4 rounded-full bg-danger"></div>
+                    </div>
                   </div>
-                </div>
-                <div className="shrink-0">
-                  <div className="flex items-center justify-center">
-                    <div className="size-4 rounded-full bg-danger"></div>
+                </motion.div>
+
+                {/* Teratogenic Flag */}
+                <motion.div
+                  variants={{
+                    hidden: { opacity: 0, x: -20 },
+                    visible: { opacity: 1, x: 0 },
+                  }}
+                  whileHover={{ x: 5, backgroundColor: "rgba(0,0,0,0.02)" }}
+                  className="flex items-center gap-4 px-6 min-h-[72px] py-4 justify-between border-b border-gray-200 dark:border-gray-700"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="text-danger flex items-center justify-center rounded-lg bg-danger/10 shrink-0 size-12">
+                      <span className="material-symbols-outlined text-3xl">
+                        flag
+                      </span>
+                    </div>
+                    <div className="flex flex-col justify-center">
+                      <p className="text-charcoal dark:text-white text-base font-medium leading-normal">
+                        Teratogenic Red Flag
+                      </p>
+                      <p className="text-gray-600 dark:text-gray-400 text-sm font-normal leading-normal">
+                        Positive - High risk of structural/functional defects.
+                      </p>
+                    </div>
                   </div>
-                </div>
-              </div>
-              {/* ListItem: Breastfeeding */}
-              <div className="flex items-center gap-4 px-6 min-h-[72px] py-4 justify-between">
-                <div className="flex items-center gap-4">
-                  <div className="text-warning flex items-center justify-center rounded-lg bg-warning/10 shrink-0 size-12">
-                    <span className="material-symbols-outlined text-3xl">
-                      breastfeeding
-                    </span>
+                  <div className="shrink-0">
+                    <div className="flex items-center justify-center">
+                      <div className="size-4 rounded-full bg-danger"></div>
+                    </div>
                   </div>
-                  <div className="flex flex-col justify-center">
-                    <p className="text-charcoal dark:text-white text-base font-medium leading-normal">
-                      Breastfeeding Compatibility
-                    </p>
-                    <p className="text-gray-600 dark:text-gray-400 text-sm font-normal leading-normal">
-                      Not Recommended - Drug is known to be excreted in human
-                      milk and may pose risk.
-                    </p>
+                </motion.div>
+
+                {/* Breastfeeding */}
+                <motion.div
+                  variants={{
+                    hidden: { opacity: 0, x: -20 },
+                    visible: { opacity: 1, x: 0 },
+                  }}
+                  whileHover={{ x: 5, backgroundColor: "rgba(0,0,0,0.02)" }}
+                  className="flex items-center gap-4 px-6 min-h-[72px] py-4 justify-between border-b border-gray-200 dark:border-gray-700"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="text-warning flex items-center justify-center rounded-lg bg-warning/10 shrink-0 size-12">
+                      <span className="material-symbols-outlined text-3xl">
+                        breastfeeding
+                      </span>
+                    </div>
+                    <div className="flex flex-col justify-center">
+                      <p className="text-charcoal dark:text-white text-base font-medium leading-normal">
+                        Breastfeeding Compatibility
+                      </p>
+                      <p className="text-gray-600 dark:text-gray-400 text-sm font-normal leading-normal">
+                        Not Recommended - Drug is known to be excreted in human
+                        milk and may pose risk.
+                      </p>
+                    </div>
                   </div>
-                </div>
-                <div className="shrink-0">
-                  <div className="flex items-center justify-center">
-                    <div className="size-4 rounded-full bg-warning"></div>
+                  <div className="shrink-0">
+                    <div className="flex items-center justify-center">
+                      <div className="size-4 rounded-full bg-warning"></div>
+                    </div>
                   </div>
-                </div>
-              </div>
-              {/* ListItem: Interactions */}
-              <div className="flex items-center gap-4 px-6 min-h-[72px] py-4 justify-between">
-                <div className="flex items-center gap-4">
-                  <div className="text-safe flex items-center justify-center rounded-lg bg-safe/10 shrink-0 size-12">
-                    <span className="material-symbols-outlined text-3xl">
-                      medication
-                    </span>
+                </motion.div>
+
+                {/* Interactions */}
+                <motion.div
+                  variants={{
+                    hidden: { opacity: 0, x: -20 },
+                    visible: { opacity: 1, x: 0 },
+                  }}
+                  whileHover={{ x: 5, backgroundColor: "rgba(0,0,0,0.02)" }}
+                  className="flex items-center gap-4 px-6 min-h-[72px] py-4 justify-between"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="text-safe flex items-center justify-center rounded-lg bg-safe/10 shrink-0 size-12">
+                      <span className="material-symbols-outlined text-3xl">
+                        medication
+                      </span>
+                    </div>
+                    <div className="flex flex-col justify-center">
+                      <p className="text-charcoal dark:text-white text-base font-medium leading-normal">
+                        Severe Interactions
+                      </p>
+                      <p className="text-gray-600 dark:text-gray-400 text-sm font-normal leading-normal">
+                        No severe interactions found with the patient's current
+                        medication list.
+                      </p>
+                    </div>
                   </div>
-                  <div className="flex flex-col justify-center">
-                    <p className="text-charcoal dark:text-white text-base font-medium leading-normal">
-                      Severe Interactions
-                    </p>
-                    <p className="text-gray-600 dark:text-gray-400 text-sm font-normal leading-normal">
-                      No severe interactions found with the patient's current
-                      medication list.
-                    </p>
+                  <div className="shrink-0">
+                    <div className="flex items-center justify-center">
+                      <div className="size-4 rounded-full bg-safe"></div>
+                    </div>
                   </div>
-                </div>
-                <div className="shrink-0">
-                  <div className="flex items-center justify-center">
-                    <div className="size-4 rounded-full bg-safe"></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+                </motion.div>
+              </motion.div>
+            </motion.div>
+          </motion.div>
+
           {/* Right Column: Alternatives & Actions */}
-          <div className="lg:col-span-1 flex flex-col gap-6">
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            className="lg:col-span-1 flex flex-col gap-6"
+          >
             {/* Alternative Medications Panel */}
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
               <h3 className="text-primary text-xl font-bold leading-tight tracking-[-0.015em]">
@@ -219,62 +312,87 @@ const RiskResult = () => {
                 The following medications are verified as safer for use in
                 pregnancy.
               </p>
-              <div className="space-y-3">
-                {/* Alternative Card */}
-                <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 cursor-pointer hover:border-primary hover:bg-primary/5 dark:hover:bg-primary/10 transition-all">
-                  <p className="font-bold text-charcoal dark:text-white">
-                    Alternative A
-                  </p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Recommended as first-line alternative.
-                  </p>
-                </div>
-                {/* Alternative Card */}
-                <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 cursor-pointer hover:border-primary hover:bg-primary/5 dark:hover:bg-primary/10 transition-all">
-                  <p className="font-bold text-charcoal dark:text-white">
-                    Alternative B
-                  </p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Consider if Alternative A is unavailable.
-                  </p>
-                </div>
-                {/* Alternative Card */}
-                <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 cursor-pointer hover:border-primary hover:bg-primary/5 dark:hover:bg-primary/10 transition-all">
-                  <p className="font-bold text-charcoal dark:text-white">
-                    Alternative C
-                  </p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Suitable with monitoring.
-                  </p>
-                </div>
-              </div>
+              <motion.div
+                initial="hidden"
+                animate="visible"
+                variants={{
+                  hidden: { opacity: 0 },
+                  visible: {
+                    opacity: 1,
+                    transition: {
+                      staggerChildren: 0.1,
+                      delayChildren: 0.5,
+                    },
+                  },
+                }}
+                className="space-y-3"
+              >
+                {/* Alternative Cards */}
+                {[
+                  {
+                    name: "Alternative A",
+                    desc: "Recommended as first-line alternative.",
+                  },
+                  {
+                    name: "Alternative B",
+                    desc: "Consider if Alternative A is unavailable.",
+                  },
+                  { name: "Alternative C", desc: "Suitable with monitoring." },
+                ].map((alt, index) => (
+                  <motion.div
+                    key={index}
+                    variants={{
+                      hidden: { opacity: 0, y: 20 },
+                      visible: { opacity: 1, y: 0 },
+                    }}
+                    whileHover={{
+                      scale: 1.03,
+                      borderColor: "rgb(59, 130, 246)",
+                    }}
+                    className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 cursor-pointer hover:bg-primary/5 dark:hover:bg-primary/10 transition-all"
+                  >
+                    <p className="font-bold text-charcoal dark:text-white">
+                      {alt.name}
+                    </p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      {alt.desc}
+                    </p>
+                  </motion.div>
+                ))}
+              </motion.div>
             </div>
-            {/* Action Buttons Panel */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
-              <h3 className="text-charcoal dark:text-white text-xl font-bold leading-tight tracking-[-0.015em] mb-4">
+
+            {/* Actions Panel */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.6 }}
+              className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6"
+            >
+              <h3 className="text-charcoal dark:text-white text-xl font-bold mb-4">
                 Actions
               </h3>
-              <div className="flex flex-col space-y-3">
-                <button className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3 text-base font-bold text-white shadow-sm hover:bg-primary/90">
-                  <span className="material-symbols-outlined">
-                    playlist_add_check
-                  </span>
-                  Select Alternative
-                </button>
-                <button
+              <div className="space-y-3">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                   onClick={generateCSV}
-                  className="flex w-full items-center justify-center gap-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-3 text-base font-bold text-charcoal dark:text-white shadow-sm hover:bg-gray-50 dark:hover:bg-gray-600"
+                  className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-primary text-white rounded-lg font-bold text-sm hover:bg-primary/90 transition-colors"
+                >
+                  <span className="material-symbols-outlined">download</span>
+                  Download Report (CSV)
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-3 border border-gray-300 dark:border-gray-600 text-charcoal dark:text-white rounded-lg font-bold text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                 >
                   <span className="material-symbols-outlined">print</span>
-                  Print / Save Report
-                </button>
-                <button className="flex w-full items-center justify-center gap-2 rounded-lg border border-transparent bg-transparent px-4 py-3 text-base font-bold text-danger hover:bg-danger/10">
-                  <span className="material-symbols-outlined">warning</span>
-                  Acknowledge & Override
-                </button>
+                  Print Results
+                </motion.button>
               </div>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         </div>
       </div>
     </ProviderLayout>
