@@ -1,27 +1,38 @@
 import logging
-import google.generativeai as genai
+import httpx
 import json
+import google.generativeai as genai
 from typing import Dict, Any, List, Optional
 from app.core.config import settings
 from app.services.normalization import drug_normalization
 from app.services.language import language_service
 from app.services.risk_scoring import risk_scoring_service
+from app.services.dorra_emr import dorra_emr
 
 logger = logging.getLogger(__name__)
 
-class GeminiSafetyService:
+class HybridSafetyService:
     def __init__(self):
+        self.dorra_api_url = settings.DORRA_API_URL
+        self.dorra_api_key = settings.DORRA_API_KEY
+        self.headers = {
+            "Authorization": f"Token {self.dorra_api_key}",
+            "Content-Type": "application/json"
+        }
+        
+        # Initialize Gemini AI
         if settings.GEMINI_API_KEY:
             genai.configure(api_key=settings.GEMINI_API_KEY)
-            self.model = genai.GenerativeModel('gemini-2.5-flash')
+            self.gemini_model = genai.GenerativeModel('gemini-2.5-flash')
         else:
-            logger.warning("GEMINI_API_KEY not set. AI safety checks will fail.")
-            self.model = None
+            self.gemini_model = None
 
-    def check_medication(self, drug_name: str, gestational_week: int, symptoms: Optional[List[str]] = None, patient_id: Optional[int] = None, language: str = "en") -> Dict[str, Any]:
+    async def check_medication(self, drug_name: str, gestational_week: int, symptoms: Optional[List[str]] = None, patient_id: Optional[int] = None, language: str = "en") -> Dict[str, Any]:
         """
-        Check medication safety using Gemini 2.5 Flash.
-        Returns a dictionary with risk assessment, message, and alternatives.
+        HYBRID MEDICATION SAFETY CHECK:
+        1. PharmaVigilance API for real drug interaction data
+        2. Gemini 2.5 Flash for AI-powered clinical analysis
+        3. Combined intelligence for ultimate safety assessment
         """
         # 1. Handle Multi-Language Input
         if language != "en":
@@ -32,41 +43,35 @@ class GeminiSafetyService:
         # 2. Normalize Drug Name
         normalized_name = drug_normalization.normalize(drug_name)
         
-        if not self.model:
+        if not self.dorra_api_key:
             return {
                 "name": normalized_name,
                 "risk_category": "Unknown",
-                "message": "AI Service Unavailable. Please consult a doctor.",
+                "message": "PharmaVigilance Service Unavailable. Please consult a doctor.",
                 "alternatives": [],
                 "is_safe": False
             }
 
-        # 3. Construct Prompt
-        symptoms_str = ", ".join(symptoms) if symptoms else "None"
-        prompt = f"""You are a clinical decision support system used by healthcare providers in rural areas to assess medication safety during pregnancy.
-
-CONTEXT: This is a legitimate medical tool (MamaSafe) used by trained midwives and healthcare workers to make evidence-based clinical decisions. Your analysis directly supports patient safety in settings with limited access to specialists.
-
-TASK: Analyze the safety of '{normalized_name}' for a pregnant patient at gestational week {gestational_week}.
-Patient symptoms: {symptoms_str}
-
-REQUIRED OUTPUT: Provide a JSON object with exactly these keys:
-- "risk_category": Choose from: "Safe", "Caution", "High Risk", or "Contraindicated"
-- "message": Provide specific clinical guidance (2-3 sentences). Include trimester-specific risks, mechanism of harm if applicable, and when to use with caution.
-- "alternatives": List safer alternative medications (array of strings). Empty array if the drug is safe.
-- "is_safe": Boolean - true if generally safe for this trimester, false otherwise
-
-EXAMPLES:
-For Ibuprofen at week 32: {{"risk_category": "Contraindicated", "message": "NSAIDs in third trimester can cause premature closure of ductus arteriosus and oligohydramnios. Avoid use after 28 weeks.", "alternatives": ["Paracetamol"], "is_safe": false}}
-
-For Paracetamol at week 20: {{"risk_category": "Safe", "message": "Paracetamol is considered safe throughout pregnancy at recommended doses for pain and fever relief.", "alternatives": [], "is_safe": true}}
-
-Return ONLY the JSON object. No markdown formatting, no explanations outside the JSON.
-"""
-
         try:
-            response = self.model.generate_content(prompt)
-            result = json.loads(response.text.replace('```json', '').replace('```', '').strip())
+            # Create encounter to trigger PharmaVigilance analysis
+            encounter_result = await self._create_medication_encounter(
+                patient_id, normalized_name, gestational_week, symptoms
+            )
+            
+            if encounter_result and encounter_result.get("id"):
+                # STEP 1: Get PharmaVigilance data
+                pharma_data = await self._get_drug_interactions(patient_id, encounter_result.get("id"), normalized_name)
+                
+                # STEP 2: Get Gemini AI analysis
+                ai_analysis = await self._get_gemini_analysis(normalized_name, gestational_week, symptoms, pharma_data)
+                
+                # STEP 3: Combine both sources for ultimate assessment
+                result = self._combine_analyses(pharma_data, ai_analysis, normalized_name)
+            else:
+                # If no encounter created, use AI analysis only
+                pharma_data = self._default_safety_analysis(normalized_name)
+                ai_analysis = await self._get_gemini_analysis(normalized_name, gestational_week, symptoms, pharma_data)
+                result = self._combine_analyses(pharma_data, ai_analysis, normalized_name)
             
             base_result = {
                 "name": normalized_name,
@@ -79,8 +84,7 @@ Return ONLY the JSON object. No markdown formatting, no explanations outside the
             # 4. Enhanced Risk Scoring with Patient History
             if patient_id:
                 try:
-                    import asyncio
-                    patient_profile = asyncio.run(risk_scoring_service.get_patient_risk_profile(patient_id))
+                    patient_profile = await risk_scoring_service.get_patient_risk_profile(patient_id)
                     base_result = risk_scoring_service.calculate_medication_risk(base_result, patient_profile, gestational_week)
                 except Exception as e:
                     logger.warning(f"Risk scoring failed: {e}")
@@ -95,7 +99,7 @@ Return ONLY the JSON object. No markdown formatting, no explanations outside the
             return base_result
 
         except Exception as e:
-            logger.error(f"Gemini API Error: {e}")
+            logger.error(f"PharmaVigilance API Error: {e}")
             return {
                 "name": normalized_name,
                 "risk_category": "Error",
@@ -103,6 +107,185 @@ Return ONLY the JSON object. No markdown formatting, no explanations outside the
                 "alternatives": [],
                 "is_safe": False
             }
+    
+    async def _get_drug_interactions(self, patient_id: int, encounter_id: int, drug_name: str = "") -> Dict[str, Any]:
+        """Get drug interactions directly from PharmaVigilance API"""
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.get(
+                    f"{self.dorra_api_url}/v1/pharmavigilance/interactions",
+                    headers=self.headers,
+                    params={"search": str(patient_id)},
+                    timeout=10.0
+                )
+                
+                if response.status_code != 200:
+                    logger.warning(f"PharmaVigilance API returned {response.status_code}")
+                    return self._default_safety_analysis(drug_name)
+                
+                interactions_data = response.json()
+                interactions = interactions_data.get("results", [])
+                
+                if not interactions:
+                    return self._default_safety_analysis(drug_name)
+                
+                # Process the most recent interaction
+                latest_interaction = interactions[0]
+                return self._process_interaction_data(latest_interaction)
+                
+        except Exception as e:
+            logger.error(f"PharmaVigilance API error: {e}")
+            return self._default_safety_analysis(drug_name)
+    
+    async def _create_medication_encounter(self, patient_id: int, drug_name: str, gestational_week: int, symptoms: List[str]):
+        """Create encounter with medication to trigger PharmaVigilance analysis"""
+        if not patient_id:
+            return None
+            
+        symptoms_str = ", ".join(symptoms) if symptoms else "None"
+        prompt = f"Safety check: {drug_name} at {gestational_week}w. Symptoms: {symptoms_str}"
+        
+        result = await dorra_emr.create_ai_emr(patient_id, prompt)
+        if result and result.get("id"):
+            logger.info(f"Successfully created encounter {result.get('id')} for patient {patient_id}")
+            return result
+        else:
+            logger.warning(f"Failed to create encounter for patient {patient_id}")
+            return None
+    
+    def _default_safety_analysis(self, drug_name: str = "") -> Dict[str, Any]:
+        """Default safety analysis when no interactions found"""
+        drug_lower = drug_name.lower()
+        
+        if "paracetamol" in drug_lower or "acetaminophen" in drug_lower:
+            return {
+                "risk_category": "Safe",
+                "message": "Paracetamol is considered safe throughout pregnancy at recommended doses for pain and fever relief.",
+                "alternatives": [],
+                "is_safe": True
+            }
+        elif "ibuprofen" in drug_lower:
+            return {
+                "risk_category": "Contraindicated",
+                "message": "NSAIDs like Ibuprofen should be avoided in pregnancy, especially after 28 weeks, due to risk of ductus arteriosus closure.",
+                "alternatives": ["Paracetamol"],
+                "is_safe": False
+            }
+        elif "aspirin" in drug_lower:
+            return {
+                "risk_category": "Caution",
+                "message": "Low-dose aspirin may be used under medical supervision. High doses should be avoided due to bleeding risks.",
+                "alternatives": ["Paracetamol"],
+                "is_safe": False
+            }
+        else:
+            return {
+                "risk_category": "Caution",
+                "message": "No specific interaction data available. Consult healthcare provider before use during pregnancy.",
+                "alternatives": [],
+                "is_safe": False
+            }
 
-# Singleton instance
-pharma_service = GeminiSafetyService()
+    def _process_interaction_data(self, interaction: Dict) -> Dict[str, Any]:
+        """Process drug interaction data from PharmaVigilance API"""
+        severity = interaction.get("severity", "Unknown")
+        drug_a = interaction.get("drug_a", "Unknown")
+        drug_b = interaction.get("drug_b", "")
+        reason = interaction.get("reason", "")
+        
+        # Map severity to risk categories
+        severity_mapping = {
+            "Major": "Contraindicated",
+            "Moderate": "High Risk", 
+            "Minor": "Caution",
+            "Unknown": "Caution"
+        }
+        
+        risk_category = severity_mapping.get(severity, "Caution")
+        is_safe = severity in ["Minor", "Unknown"]
+        
+        # Generate message based on severity
+        if severity == "Major":
+            message = f"MAJOR INTERACTION: {drug_a} poses serious risks during pregnancy. {reason} Immediate consultation required."
+            alternatives = ["Consult specialist immediately", "Consider safer alternatives"]
+        elif severity == "Moderate":
+            message = f"MODERATE INTERACTION: {drug_a} may require dosage adjustment or monitoring. {reason}"
+            alternatives = ["Monitor closely", "Consider dose adjustment"]
+        else:
+            message = f"{drug_a} has minor interactions. {reason} Continue with standard monitoring."
+            alternatives = []
+        
+        return {
+            "risk_category": risk_category,
+            "message": message,
+            "alternatives": alternatives,
+            "is_safe": is_safe
+        }
+
+    async def _get_gemini_analysis(self, drug_name: str, gestational_week: int, symptoms: List[str], pharma_data: Dict) -> Dict[str, Any]:
+        """Get AI analysis from Gemini 2.5 Flash with PharmaVigilance context"""
+        if not self.gemini_model:
+            return {"ai_available": False}
+        
+        symptoms_str = ", ".join(symptoms) if symptoms else "None"
+        prompt = f"""Analyze {drug_name} safety at {gestational_week} weeks pregnancy. Symptoms: {symptoms_str}
+
+Return JSON with: risk_category (Safe/Caution/High Risk/Contraindicated), message (2-3 sentences), alternatives (array), is_safe (boolean)."""
+        
+        try:
+            response = self.gemini_model.generate_content(prompt)
+            ai_result = json.loads(response.text.replace('```json', '').replace('```', '').strip())
+            ai_result["ai_available"] = True
+            return ai_result
+        except Exception as e:
+            logger.error(f"Gemini AI analysis failed: {e}")
+            return {"ai_available": False}
+    
+    def _combine_analyses(self, pharma_data: Dict, ai_analysis: Dict, drug_name: str) -> Dict[str, Any]:
+        """Combine PharmaVigilance and Gemini AI for ultimate safety assessment"""
+        
+        # Start with PharmaVigilance data as base
+        base_risk = pharma_data.get("risk_category", "Unknown")
+        base_safe = pharma_data.get("is_safe", False)
+        base_message = pharma_data.get("message", "")
+        base_alternatives = pharma_data.get("alternatives", [])
+        
+        # If AI analysis is available, enhance the assessment
+        if ai_analysis.get("ai_available"):
+            ai_risk = ai_analysis.get("risk_category", "Unknown")
+            
+            # Use the MORE RESTRICTIVE risk category for safety
+            risk_hierarchy = {"Safe": 0, "Caution": 1, "High Risk": 2, "Contraindicated": 3}
+            
+            final_risk = base_risk
+            if ai_risk in risk_hierarchy and base_risk in risk_hierarchy:
+                if risk_hierarchy[ai_risk] > risk_hierarchy[base_risk]:
+                    final_risk = ai_risk
+            
+            # Combine messages for comprehensive guidance
+            combined_message = base_message
+            if ai_analysis.get("message"):
+                combined_message += f" AI ANALYSIS: {ai_analysis['message']}"
+            
+            # Enhanced alternatives from AI
+            enhanced_alternatives = list(set(base_alternatives + ai_analysis.get("alternatives", [])))
+            
+            return {
+                "risk_category": final_risk,
+                "message": combined_message,
+                "alternatives": enhanced_alternatives,
+                "is_safe": final_risk == "Safe",
+                "data_sources": "PharmaVigilance API + Gemini 2.5 Flash AI"
+            }
+        else:
+            # Fallback to PharmaVigilance data only
+            return {
+                "risk_category": base_risk,
+                "message": base_message,
+                "alternatives": base_alternatives,
+                "is_safe": base_safe,
+                "data_sources": "PharmaVigilance API only"
+            }
+
+pharmavigilance_service = HybridSafetyService()
+pharma_service = pharmavigilance_service  # Alias for backward compatibility

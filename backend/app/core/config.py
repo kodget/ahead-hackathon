@@ -22,5 +22,6 @@ class Settings:
     DORRA_API_URL: str = os.getenv("DORRA_API_URL", "https://hackathon-api.aheadafrica.org")
     DORRA_API_KEY: str = os.getenv("DORRA_API_KEY", "")
     GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "")
+    BASE_URL: str = os.getenv("BASE_URL", "http://localhost:8000")
 
 settings = Settings()

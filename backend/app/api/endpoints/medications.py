@@ -72,7 +72,7 @@ async def check_medication(
         except ValueError:
             pass
     
-    ai_analysis = pharma_service.check_medication(
+    ai_analysis = await pharma_service.check_medication(
         drug_name=request.drug_name, 
         gestational_week=gestational_week,
         symptoms=request.symptoms,
